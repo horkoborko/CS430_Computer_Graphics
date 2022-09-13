@@ -34,7 +34,7 @@ int main()
 // Function Implementation
 bool readInputFile( char *inputFile, uint32_t **colorMap, int *width, int *height, int *maxColorVal)
 {
-   uint8_t image[];
+   uint8_t image[]; // Storage of read file, adjusted for P3 or P6
    char magicNumber;
    int width;
    int height; 
