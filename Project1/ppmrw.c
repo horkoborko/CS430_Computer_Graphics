@@ -45,9 +45,6 @@ bool readInputFile( char *inputFile, uint32_t **colorMap, int *width, int *heigh
    if (fh != NULL) {
 
    }
-
-   // initialize variables 
-   
    // if the input file opens and we are not at the end of the file 
 
       // read the first character 
