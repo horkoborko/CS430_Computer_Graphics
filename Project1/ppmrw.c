@@ -34,6 +34,18 @@ int main()
 // Function Implementation
 bool readInputFile( char *inputFile, uint32_t **colorMap, int *width, int *height, int *maxColorVal)
 {
+   uint8_t image[];
+   char magicNumber;
+   int width;
+   int height; 
+   int maxColorValue; 
+
+   FILE *fh = fopen(inputFile, "r");
+
+   if (fh != NULL) {
+
+   }
+
    // initialize variables 
    
    // if the input file opens and we are not at the end of the file 
@@ -52,7 +64,11 @@ bool readInputFile( char *inputFile, uint32_t **colorMap, int *width, int *heigh
    
             // read the next character
 
-	    // while not at end of file and character is space 
+	    // while not at end of file and character is space or end of line character or a pound sign  
+
+	       // if the character was a pound sign 
+
+                  // fgets in order to remove the comment line 
 
 	       // read string until next white space (%s on fscanf)
 
