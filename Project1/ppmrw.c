@@ -9,7 +9,7 @@
 // Global Constants
 
 // Function Prototypes
-bool readInputFile( char *inputFile, uint32_t **colorMap);
+bool readInputFile( char *inputFile, uint32_t **colorMap, int *width, int *height, int *maxColorVal);
 void writeOutputFile( char *outputFile, uint32_t **colorMap, int writingNumber);
 
 // Main Function
@@ -32,7 +32,7 @@ int main()
 }
 
 // Function Implementation
-bool readInputFile( char *inputFile, uint32_t **colorMap)
+bool readInputFile( char *inputFile, uint32_t **colorMap, int *width, int *height, int *maxColorVal)
 {
    // initialize variables 
    
@@ -134,6 +134,67 @@ bool readInputFile( char *inputFile, uint32_t **colorMap)
 
 void writeOutputFile( char *outputFile, uint32_t **colorMap, int writingNumber)
 {
+   // initialize variables 
+
+   // open the output file 
+   
+   // if the file we are writing is a p3
+
+      // write the magic number into the file 
+
+   // otherwise, if the file we are writing to is a p6 
+
+      // write the magic number into the file 
+
+   // write a space into the file 
+
+   // write the width into the file 
+
+   // write a space into the file 
+
+   // write the height into the file 
+   
+   // write a space into the file 
+
+   // write the max color value into the file 
+
+   // write a newline into the file 
+
+   // if the file we are writing to is a p3 
+
+      // for every row in the grid 
+	
+	   // for every column in the grid 
+
+	      // write the red value in ascii
+
+	      // write the blue value in ascii 
+
+	      // write the green value in ascii 
+
+	      // write the alpha value in ascii (100% opacity)
+
+	      // write 2 spaces to the file 
+
+	   // add an endline to the file 
+
+   // otherwise, if the file we are writing to is a p6 
+
+      // for every row in the grid 
+	
+	   // for every column in the grid 
+
+	      // write the red value in binary
+
+	      // write the blue value in binary 
+
+	      // write the green value in binary 
+
+	      // write the alpha value in binary (100% opacity)
+
+	      // write 2 spaces to the file 
+
+	   // add an endline to the file 
 
 
 
