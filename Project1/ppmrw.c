@@ -34,10 +34,19 @@ int main()
 // Function Implementation
 bool readInputFile( char *inputFile, uint32_t **colorMap)
 {
-   // initialize variables 
-   
-   // if the input file opens and we are not at the end of the file 
+  uint8_t image[];  // Storage of read file, adjusted for P3 or P6
+  char magicNumber;
+  int width;
+  int height;
+  int maxColorValue;
 
+  FILE *fh = fopen(inputFile, "r");
+
+  if(fh != NULL) {
+    
+  }
+  // if the input file opens and we are not at the end of the file 
+  
       // read the first character 
 
       // if the first character is a P and we are not at the end of the file 
