@@ -34,16 +34,28 @@ int main()
 // Function Implementation
 bool readInputFile( char *inputFile, uint32_t **colorMap, int *width, int *height, int *maxColorVal)
 {
-   uint8_t image[]; // Storage of read file, adjusted for P3 or P6
+   uint32_t image[]; // Storage of read file, adjusted for P3 or P6
    char magicNumber;
    int width;
-   int height; 
+   int height;
+   int headerBytes = ;
    int maxColorValue; 
 
    FILE *fh = fopen(inputFile, "r");
+   fread(colormap, sizeof(uint32_t), headerBytes, fh);
+   fclose(fh);
 
-   if (fh != NULL) {
-
+   char currentLine;
+   while(cursor != '\0') {
+     fgets(char *currentLine, int size, FILE *fh);
+     for(int i; i <= sizeof(currentLine); i++) {
+       if(currentLine[i] == 'P') {
+	 char magicNumber = currentLine[i] + currentLine[i+1];
+       }
+       if(currentLine[i] == '\n') {
+	 
+       }
+     }
    }
    // if the input file opens and we are not at the end of the file 
 
