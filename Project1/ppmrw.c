@@ -11,6 +11,7 @@
 // Function Prototypes
 bool readInputFile( char *inputFile, uint32_t **colorMap, int *width, int *height, int *maxColorVal);
 void writeOutputFile( char *outputFile, uint32_t **colorMap, int writingNumber);
+bool readUntilNextChar( FILE *filePointer, char *readNum);
 
 // Main Function
 int main()
@@ -34,15 +35,13 @@ int main()
 // Function Implementation
 bool readInputFile( char *inputFile, uint32_t **colorMap, int *width, int *height, int *maxColorVal)
 {
-   uint32_t image[]; // Storage of read file, adjusted for P3 or P6
+/*
+   uint32_t *image; // Storage of read file, adjusted for P3 or P6
    char magicNumber;
-   int width;
-   int height;
-   int headerBytes = ;
-   int maxColorValue; 
+   int headerBytes;
 
    FILE *fh = fopen(inputFile, "r");
-   fread(colormap, sizeof(uint32_t), headerBytes, fh);
+   fread(colorMap, sizeof(uint32_t), headerBytes, fh);
    fclose(fh);
 
    char currentLine;
@@ -57,61 +56,63 @@ bool readInputFile( char *inputFile, uint32_t **colorMap, int *width, int *heigh
        }
      }
    }
+
+*/
+
+   // initialize variables 
+
    // if the input file opens and we are not at the end of the file 
 
-      // read the first character 
+      // read the first string
+         // function: fscanf 
 
-      // if the first character is a P and we are not at the end of the file 
+      // if the string is p3 or p6 
        
-	 // read the second character 
-
-         // if the second character is a 3 or a 6
-
-	    // set valid input to true  
-
-	 // if not at end of file and valid input is true
+	 // if not at end of file 
    
-            // read the next character
+	    // get the next numerical value 
+	       // function: readUntilNextNum
 
-	    // while not at end of file and character is space or end of line character or a pound sign  
+	    // if the function returned false (no num found)
 
-	       // if the character was a pound sign 
-
-                  // fgets in order to remove the comment line 
-
-	       // read string until next white space (%s on fscanf)
-
-	    // if the character is a space 
+	       // print error 
 
 	       // reached end of file, return false 
 
 	    // otherwise, found width, store width
 
-	    // while not at end of file and character is space 
-
-	       // read string until next white space
-
-	    // if the character is a space 
-
-	       // reached end of file, return false 
+            // get the next numerical value 
+	       // function: readUntilNextNum
 	
-	    // 
+	    // if the function returned false (no num found)
 
-	    // while not at end of file and character is space 
+	       // print error 
 
-	       // read next character 
+	       // reached end of file, return false    
 
-	    // if the character is a space 
+	    // otherwise, found height, store height
 
-	       // reached end of file, return false 
+	    // get the next numerical value
+	       // function: readUntilNextNum
 
-	    // read max color value 
+	    // if the function returned false (no num found)
+
+	       // print error 
+
+	       // reached end of file, return false    
+
+	    // otherwise, found max color val, store value 
 	 
 	    // clear next whitespace 
+	       // function: fgetc
+
+	    // get memory for array 
+	    // malloc (width * height * sizeof(uint32_t);
 	 
 	    // put the board of data into the passed in array 
 
 	       // if the file is a p3 file 
+	          // function: strcmp
 
 	          // for every row in the data 
 
@@ -125,25 +126,24 @@ bool readInputFile( char *inputFile, uint32_t **colorMap, int *width, int *heigh
 
 	       // if the file is a p6 file 
 
-	          // while not at the end of the file 
+	          // for every row in the file 
 
-	              // read the next bit 
-		 
-	              // insert the next bit into a temporary array 
+	             // for every column in the file 
 
-	              // after the number of bits in the array is 8
+	                // convert the binary value to ascii 
 
-	                  // calculate ascii number 
-
-	                  // reset number of bits in array
-
-	                  // insert ascii number into return array 
+	                // pack the ascii number into a single number 
+			// store that number in the array 
+	
+	            // remove end line 
 
 	       // return true
 
-	 // otherwise, fall through and return false, not p3 or p6
+      // otherwise
 
-      // otherwise, fall through and return false, not P format
+         // print error 
+
+	 // return false, not proper format
       
       // close the input file 
 
@@ -186,6 +186,7 @@ void writeOutputFile( char *outputFile, uint32_t **colorMap, int writingNumber)
    // write a newline into the file 
 
    // if the file we are writing to is a p3 
+      // function: fprintf
 
       // for every row in the grid 
 	
@@ -204,6 +205,7 @@ void writeOutputFile( char *outputFile, uint32_t **colorMap, int writingNumber)
 	   // add an endline to the file 
 
    // otherwise, if the file we are writing to is a p6 
+      // function: fprintf
 
       // for every row in the grid 
 	
@@ -225,3 +227,28 @@ void writeOutputFile( char *outputFile, uint32_t **colorMap, int writingNumber)
 
 
 }
+
+bool readUntilNextNum( FILE *filePointer, char *readNum)
+{
+   
+   // read the next character
+
+   // while not at end of file and character is space or end of line character or a pound sign  
+
+      // if the character was a pound sign 
+
+         // fgets in order to remove the comment line 
+
+      // read string until next white space (%s on fscanf)
+
+      // if the character is a space 
+
+         // reached end of file, return false 
+
+   // after leaving loop, have valid value, put value to return 
+
+   // return true
+
+   return false; // STUB RETURN
+}
+
