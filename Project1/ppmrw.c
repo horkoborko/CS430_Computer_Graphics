@@ -34,50 +34,45 @@ int main()
 // Function Implementation
 bool readInputFile( char *inputFile, uint32_t **colorMap, int *width, int *height, int *maxColorVal)
 {
-   uint32_t image[]; // Storage of read file, adjusted for P3 or P6
+   uint32_t *image; // Storage of read file, adjusted for P3 or P6
    char magicNumber;
-   int width;
-   int height;
-   int headerBytes = ;
    int maxColorValue; 
 
    FILE *fh = fopen(inputFile, "r");
    fread(colormap, sizeof(uint32_t), headerBytes, fh);
    fclose(fh);
 
-   char currentLine;
-   while(cursor != '\0') {
-     fgets(char *currentLine, int size, FILE *fh);
-     for(int i; i <= sizeof(currentLine); i++) {
-       if(currentLine[i] == 'P') {
-	 char magicNumber = currentLine[i] + currentLine[i+1];
-       }
-       if(currentLine[i] == '\n') {
-	 
-       }
-     }
+   fgets(char *currentLine, int size, FILE *fh);
+   if(currentLine[0] == 'P' && (currentLine[1] == '3' || currentLine[1] == '6')) {
+     magicNumber = currentLine[0] + currentline[1];
    }
-   // if the input file opens and we are not at the end of the file 
-
-      // read the first character 
-
-      // if the first character is a P and we are not at the end of the file 
-       
-	 // read the second character 
-
-         // if the second character is a 3 or a 6
-
-	    // set valid input to true  
-
-	 // if not at end of file and valid input is true
+   else {
+     fprint("ERROR: Invalid PPM Magic Number");
+   }\
    
-            // read the next character
+   char currentLine;
 
-	    // while not at end of file and character is space or end of line character or a pound sign  
+   // Reading Header Section
+   while(currentLine != '\0') {
+     fgets(char *currentLine, int size, FILE *fh);
+       for(int i; i <= sizeof(currentLine); i++) {
+	 if(currentLine[i] == '#' || currentLine[i] == '\n') {
+	   break;
+	 }
+	 elif(currentLine[i] == ' ') {
+	   continue;
+	 }
+	 else {
+	   // I would like your commentary as to how we can reliably detect the correct width/height/max_color_value,
+	   // in case Palmer throws in an extra value somewhere in the header or lacks information
+	 }
+       }
+   }
 
-	       // if the character was a pound sign 
-
-                  // fgets in order to remove the comment line 
+   //Reading Image Data
+   while(currentLine != '\0') {
+     return //dummy value for now
+   }
 
 	       // read string until next white space (%s on fscanf)
 
@@ -94,8 +89,6 @@ bool readInputFile( char *inputFile, uint32_t **colorMap, int *width, int *heigh
 	    // if the character is a space 
 
 	       // reached end of file, return false 
-	
-	    // 
 
 	    // while not at end of file and character is space 
 
@@ -140,10 +133,6 @@ bool readInputFile( char *inputFile, uint32_t **colorMap, int *width, int *heigh
 	                  // insert ascii number into return array 
 
 	       // return true
-
-	 // otherwise, fall through and return false, not p3 or p6
-
-      // otherwise, fall through and return false, not P format
       
       // close the input file 
 
