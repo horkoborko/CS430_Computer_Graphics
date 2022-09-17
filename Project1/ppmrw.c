@@ -148,10 +148,16 @@ bool readInputFile( char *inputFile, uint32_t **colorMap, int *width, int *heigh
 
 void writeOutputFile( char *outputFile, uint32_t **colorMap, int writingNumber)
 {
-   // initialize variables 
+  FILE *fh = fopen(outputFile, "w");
+  if(writingNumber == 3) {
+    fwrite(fh, 
+  }
+  elif(writingNumber == 6) {
 
-   // open the output file 
-   
+  }
+  else {
+
+  }
    // if the file we are writing is a p3
 
       // write the magic number into the file 
