@@ -11,8 +11,8 @@
 const int MAX_IN_LENGTH = 40;
 
 // Function Prototypes
-bool readInputFile( char *inputFile, uint32_t *colorMap, int *width, int *height, int *maxColorVal);
-void writeOutputFile( char *outputFile, uint32_t *colorMap, int writingNumber);
+bool readInputFile( char *inputFile, uint32_t **colorMap, int *width, int *height, int *maxColorVal);
+void writeOutputFile( char *outputFile, uint32_t *colorMap, int writingNumber, int width, int height, int maxColorVal);
 bool readUntilNextNum( FILE *filePointer, int *readNum);
 void checkResult(bool inputBool);
 
@@ -43,14 +43,14 @@ int main(int argc, char **argv)
 
       // read in the input file 
          // function: readInputFile
-      goodInputFile = readInputFile( inputFileName, colorMap, &width, &height, &maxColorVal);
+      goodInputFile = readInputFile( inputFileName, &colorMap, &width, &height, &maxColorVal);
 
       // if the input was good
       if (goodInputFile)
       { 
          // write out the output 
             // function: writeOutputFile
-         writeOutputFile( outputFileName, colorMap, magicNumToConvert);
+         writeOutputFile( outputFileName, colorMap, magicNumToConvert, width, height, maxColorVal);
 
       }
    }
@@ -68,12 +68,13 @@ int main(int argc, char **argv)
 }
 
 // Function Implementation
-bool readInputFile( char *inputFile, uint32_t *colorMap, int *width, int *height, int *maxColorVal)
+bool readInputFile( char *inputFile, uint32_t **colorMap, int *width, int *height, int *maxColorVal)
 {
    // initialize variables 
    bool goodVal = false;
    char magicNum[5];
    int nextValue, red, green, blue, readValues;
+   int redRead, blueRead, greenRead;
    uint8_t red8, green8, blue8;
    FILE *fh;
    int rowIndex = 0, colIndex = 0;
@@ -145,7 +146,8 @@ bool readInputFile( char *inputFile, uint32_t *colorMap, int *width, int *height
 	    checkResult(goodVal);
 	 
 	    // get memory for array 
-	    colorMap = (uint32_t *)( malloc(*width * *height * sizeof(uint32_t)));
+	       // function: malloc
+	    *colorMap = (uint32_t *)( malloc(*width * *height * sizeof(uint32_t)));
 
 	    // put the board of data into the passed in array 
 
@@ -181,9 +183,8 @@ bool readInputFile( char *inputFile, uint32_t *colorMap, int *width, int *height
 	                   // pack the 3 values into a single 32 bit int number 
 			   tempNum = red << 24 | green << 16 | blue << 8 | 0xff;
 
-
 	                   // store that number in the array 
-			   colorMap[rowIndex * *width + colIndex] = tempNum;
+			   (*colorMap)[rowIndex * *width + colIndex] = tempNum;
 
 			}
 
@@ -212,112 +213,151 @@ bool readInputFile( char *inputFile, uint32_t *colorMap, int *width, int *height
 		     {
 	                // read the next 3 bytes in
 			   // function: fread
-			readValues = fread(&red8, 1, 1, fh);
-                        fread(&blue8, 1, 1, fh);
-                        fread(&green8, 1, 1, fh);
+			redRead = fread(&red8, 1, 1, fh);
+                        greenRead = fread(&green8, 1, 1, fh); //TODO: FIX STOP READING AFTER 34 READS
+                        blueRead = fread(&blue8, 1, 1, fh);
 
-	                // if fread could read the number 
-	
+	                // if fread could read the number and not on last run
+			if (redRead && blueRead && greenRead )
+                        {	
      	                   // if the value is greater than the max value 
-
+			   if (red8 > *maxColorVal || blue8 > *maxColorVal || green8 > *maxColorVal)
+                           {
 	                      // print error 
 			         // function: printf
+			      fprintf(stderr, "ERROR: Value found higher than max value.\n");
 
 	                      // return false 
+			      return false;
+			   }
 
-	                   // pack the ascii number into a single number 
+	                   // pack the 3 values into a single 32 bit int number 
+			   tempNum = red8 << 24 | green8 << 16 | blue8 << 8 | 0xff;
 
-			   // store that number in the array 
+	                   // store that number in the array 
+			   *colorMap[rowIndex * *width + colIndex] = tempNum;
+
+			   
+			}
 
 	                // otherwise, end of input file 
-
-	                   // print error 
-			      // function: printf
-			   
-	                   // return false, bad input file 	    
+			else
+                        {
+			   // print error 
+			      // function: checkResult
+			   checkResult(false);
+			}
 	
 		     }
                   }
 	       }
 	 }
 
-	       // return true TODO: SEE IF NEEDS TO BE HERE
+	 // return true 
+	 return true;
       }
    }
 
       // otherwise
+      else
+      {
 
          // print error 
-	    // function: fgetc
+	    // function: fprintf
+	 fprintf(stderr, "ERROR: Not proper file format.\n");
 
 	 // return false, not proper format
+	 return false;
+      }
       
       // close the input file 
          // function: fclose
+      fclose(fh);
 
    // otherwise, no file, return false	
+   return false;
 
-   
-
-
-
-   return false; //STUB RETURN   
 }
 
 
-void writeOutputFile( char *outputFile, uint32_t *colorMap, int writingNumber)
+void writeOutputFile( char *outputFile, uint32_t *colorMap, int writingNumber, int width, int height, int maxColorVal)
 {
    // initialize variables 
+   FILE *fh;
+   int rowIndex = 0, colIndex = 0;
+   uint32_t tempNum;
+   uint8_t red, blue, green;
 
    // open the output file 
       // function: fopen
+   fh = fopen(outputFile, "w");
    
-   // if the file we are writing is a p3
-
-      // write the magic number into the file 
-         // function: fprintf
-
-   // otherwise, if the file we are writing to is a p6 
-
-      // write the magic number into the file 
-         // function: fprintf
+   // write magic number to file 
+      // function: fprintf
+   fprintf(fh, "P%d\n", writingNumber);
 
    // write a space, then width, then space, then height, then space, then max color val, ended by newline
       // function: fprintf
+   fprintf(fh, "%d %d %d\n", width, height, maxColorVal);
 
    // if the file we are writing to is a p3 
-      // function: fprintf
-
+   if (writingNumber == 3)
+   {
       // for every row in the grid 
-	
+      for (rowIndex = 0; rowIndex < height; rowIndex++)
+      {	
 	   // for every column in the grid 
+	   for (colIndex = 0; colIndex < width; colIndex++)
+           {
+
+	      // get color map value 
+              tempNum = colorMap[rowIndex * width + colIndex];
 
 	      // write the red value in ascii, followed by blue, followed by green TODO: NEED ALPHA HERE?
+	         // function: fprintf
+	      fprintf(fh, "%d %d %d \n", tempNum >> 24, tempNum >> 16 & 0xff, tempNum >> 8 & 0xff);
 
-	      // write 2 spaces to the file 
+	   }
 
-	   // add an endline to the file 
+      }
+   } 
 
-   // otherwise, if the file we are writing to is a p6 
-      // function: fprintf
-
+   // otherwise, file is p6
+   else 
+   {
       // for every row in the grid 
-	
+      for (rowIndex = 0; rowIndex < height; rowIndex++)
+      {	
 	   // for every column in the grid 
+	   for (colIndex = 0; colIndex < width; colIndex++)
+           {
+
+	      // get color map value 
+              tempNum = colorMap[rowIndex * width + colIndex];
+
+	      // get red value 
+	      red = tempNum >> 24;
+
+	      // get green value 
+	      green = tempNum >> 16 & 0xff;
+
+	      // get blue value 
+	      blue = tempNum >> 8 & 0xff;
 
 	      // write the red value in binary
 	         // function: fwrite
-
-	      // write the blue value in binary 
-	         // function: fwrite
+	      fwrite(&red, 1, 1, fh);
 
 	      // write the green value in binary 
 	         // function: fwrite
+	      fwrite(&green, 1, 1, fh);
 
-	      // write the alpha value in binary (100% opacity) TODO: NEED TO DO THIS?
+	      // write the blue value in binary 
 	         // function: fwrite
-
-	   // add an endline to the file 
+	      fwrite(&blue, 1, 1, fh);
+            }
+      }
+   }
 
 
 
