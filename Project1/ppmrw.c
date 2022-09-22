@@ -96,6 +96,22 @@ bool readInputFile( char *inputFile, uint32_t **colorMap, int *width, int *heigh
          // function: strcmp
       if (strcmp("P3", magicNum) == 0 || strcmp("P6", magicNum) == 0)
       {
+	 // if the string is p6 
+	 if (strcmp("P6", magicNum) == 0)
+         {
+
+	    // close the input file 
+	       // function: fclose 
+	    fclose(fh);
+
+	    // reopen the input file in binary 
+	       // function: fopen
+	    fh = fopen(inputFile, "rb");
+
+	    // re-read the magic number to put the file handle at the proper place
+	       // function: fscanf
+	    fscanf(fh, "%s", magicNum);        
+	 }
        
 	 // if not at end of file 
 	    // function: feof
@@ -235,9 +251,8 @@ bool readInputFile( char *inputFile, uint32_t **colorMap, int *width, int *heigh
 			   tempNum = red8 << 24 | green8 << 16 | blue8 << 8 | 0xff;
 
 	                   // store that number in the array 
-			   *colorMap[rowIndex * *width + colIndex] = tempNum;
+			   (*colorMap)[rowIndex * *width + colIndex] = tempNum;
 
-			   
 			}
 
 	                // otherwise, end of input file 
@@ -288,10 +303,21 @@ void writeOutputFile( char *outputFile, uint32_t *colorMap, int writingNumber, i
    uint32_t tempNum;
    uint8_t red, blue, green;
 
-   // open the output file 
-      // function: fopen
-   fh = fopen(outputFile, "w");
-   
+   // if the file is p3 
+   if (writingNumber == 3)
+   {
+      // open the output file in ascii
+         // function: fopen
+      fh = fopen(outputFile, "w");
+   }
+
+   // otherwise, file is p6 
+   else 
+   {
+      // open output file in binary 
+      fh = fopen(outputFile, "wb");
+   }
+
    // write magic number to file 
       // function: fprintf
    fprintf(fh, "P%d\n", writingNumber);
@@ -313,7 +339,7 @@ void writeOutputFile( char *outputFile, uint32_t *colorMap, int writingNumber, i
 	      // get color map value 
               tempNum = colorMap[rowIndex * width + colIndex];
 
-	      // write the red value in ascii, followed by blue, followed by green TODO: NEED ALPHA HERE?
+	      // write the red value in ascii, followed by blue, followed by green 
 	         // function: fprintf
 	      fprintf(fh, "%d %d %d \n", tempNum >> 24, tempNum >> 16 & 0xff, tempNum >> 8 & 0xff);
 
