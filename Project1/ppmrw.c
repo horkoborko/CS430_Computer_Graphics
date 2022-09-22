@@ -494,7 +494,7 @@ void checkResult(bool inputBool)
    {
       // print error code to std error 
          // function: fprintf
-      fprintf(stderr, "Error: Improper Result from File\n");
+      fprintf(stderr, "Error: Improper Result from File.\n");
 
       // exit 0
       exit(0);
