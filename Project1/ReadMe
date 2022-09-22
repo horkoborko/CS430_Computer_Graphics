@@ -1,0 +1,14 @@
+# Authors 
+Logan Samstag 
+Hannah Trenary
+
+# Usage 
+To use this program, compile the program with the given make file. Then,
+put the p3 or p6 file that you wish to convert into the same directory as 
+the executable "ppmrw". Then, run the executable on the command line with this 
+format: ppmrw MAGIC_NUM INPUT_FILE OUTPUT_FILE in order to convert INPUT_FILE
+into the file format of P(MAGIC_NUM) and put the file into OUTPUT_FILE. 
+
+# Known issues
+The makefile clean option does not work on Windoes based machines, as the
+command does not exist on Windows. 

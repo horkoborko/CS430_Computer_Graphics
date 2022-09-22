@@ -60,7 +60,7 @@ int main(int argc, char **argv)
    {   
       // print error 
          // function: printf
-      printf("ERROR: Improper num of argument recieved. Expected 4, got %d\n", argc);
+      printf("Input Format: ppmrw MAGIC_NUM INPUT_FILE OUTPUT_FILE\n");
    }
 
    // return 0
@@ -230,7 +230,7 @@ bool readInputFile( char *inputFile, uint32_t **colorMap, int *width, int *heigh
 	                // read the next 3 bytes in
 			   // function: fread
 			redRead = fread(&red8, 1, 1, fh);
-                        greenRead = fread(&green8, 1, 1, fh); //TODO: FIX STOP READING AFTER 34 READS
+                        greenRead = fread(&green8, 1, 1, fh); 
                         blueRead = fread(&blue8, 1, 1, fh);
 
 	                // if fread could read the number and not on last run
@@ -432,9 +432,9 @@ bool readUntilNextNum( FILE *filePointer, int *readNum)
       // function: isspace
    if ( isspace((char)(nextChar)) || nextChar == (int)'#')
    {
-      // reached end of file, print error 
-         // function: checkResult
-      checkResult(false);
+      // print error 
+         // function: printf
+      fprintf(stderr, "Error: End of File Unexpectedly Reached.\n");
    }
 
    // insert first number in string 
@@ -494,7 +494,7 @@ void checkResult(bool inputBool)
    {
       // print error code to std error 
          // function: fprintf
-      fprintf(stderr, "Error: %s\n", strerror(errno));
+      fprintf(stderr, "Error: Improper Result from File\n");
 
       // exit 0
       exit(0);

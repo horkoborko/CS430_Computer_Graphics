@@ -1,6 +1,6 @@
 CC=gcc
 CFLAGS=-Wall
-RM=rm -f
+RM=rm -rf
 
 all: ppmrw
 
@@ -8,4 +8,4 @@ ppmrw: ppmrw.c
 	$(CC) $(CFLAGS) ppmrw.c -o ppmrw
 
 clean: 
-	$(RM) ppmrw *~
+	$(RM) *~ ppmrw
