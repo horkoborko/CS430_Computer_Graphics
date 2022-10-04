@@ -10,6 +10,7 @@ int main()
    float b[] = {0, 1, 0};
    float c[] = {0, 0, 0};
    float d[] = {-1, 1, 0};
+   float e[] = {1, 1, 0};
 
    // TESTS FOR FROM POINTS
    v3_from_points(c, b, a);
@@ -19,7 +20,7 @@ int main()
       printf("ERROR: Got {%f, %f, %f}, expected {%f, %f, %f}\n", c[0], c[1], c[2], d[0], d[1], d[2]);
    }
 
-   // from points test
+   // reset points test
    a[0] = 1;
    a[1] = 0;
 
@@ -32,10 +33,18 @@ int main()
       printf("ERROR: Got {%f, %f, %f}, expected {%f, %f, %f}\n", c[0], c[1], c[2], d[0], d[1], d[2]);
    }
 
+   // reset points test
+   b[0] = 0;
+   b[1] = 1;
+
 
    // TESTS FOR ADD
    v3_add(c, b, a);
 
+   if(!(v3_equals(c, e, .01)))
+   {
+     printf("ERROR: Got {%f, %f, %f}, expected {%f, %f, %f}\n", c[0], c[1], c[2], e[0], e[1], e[2]);
+   }
 
    // TESTS FOR SUBTRACT
    v3_subtract(c, b, a);
@@ -50,15 +59,15 @@ int main()
 
 
    // TESTS FOR SCALE
-   x3_scale(a, 2);
+   v3_scale(a, 2);
 
 
    // TESTS FOR ANGLE
-   x3_angle(a, b)
+   v3_angle(a, b);
 
 
    // TESTS FOR ANGLE QUICK
-   x3_quick_angle(a, b);
+   v3_quick_angle(a, b);
 
 
    // TESTS FOR REFLECT
@@ -66,14 +75,10 @@ int main()
 
 
    // TESTS FOR LENGTH
-   x3_length(a);
+   v3_length(a);
 
 
    // TESTS FOR NORMALIZE
-
-
-
-   // TESTS FOR EQUALS
 
 
 
