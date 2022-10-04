@@ -9,16 +9,10 @@ void v3_from_points(float *dst, float *a, float *b)
 {
    // initialize variables 
 
-   // subtract ax (head) from bx (tail)
-   dst[0] = a[0] - b[0];
-   
-   // subtract ay (head) from by (tail)
-   dst[1] = a[1] - b[1];
+   // subtract head (b) from tail (a)
+      // function: v3_subtract
+   v3_subtract( dst, b, a);
 
-   // subtract az (head) From bz (tail)
-   dst[2] = a[2] - b[2];
-
-   // TODO: ASK IF FUNCTION IS SIMPLY SUBTRACTION OR SOMETHING MORE
 
 }
 
