@@ -139,7 +139,7 @@ int main()
          printf("ERROR: Got {%f, %f, %f}, expected {%f, %f, %f}\n", c[0], c[1], c[2], d[0], d[1], d[2]);
       }
    }
-   // TODO: TEST BELOW TEST
+
    // dot product test 1
    {
       float a[] = {0, 1, 0};
