@@ -15,4 +15,4 @@ v3math.o: v3math.c v3math.h
 	$(CC) $(LFLAGS) v3math.c
 
 clean: 
-	$(RM) *~ v3test
+	$(RM) *~ *.o v3test

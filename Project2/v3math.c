@@ -95,7 +95,7 @@ float v3_angle(float *a, float *b) // angle between a and b
 {
    // return the arccos of the angle after getting from v3_angle_quick
       // function: v3_angle_quick
-   return acos( v3_angle_quick( a, b));
+   return acosf( v3_angle_quick( a, b));
 
 
 }
@@ -161,9 +161,15 @@ void v3_normalize(float *dst, float *a)
       // function: v3_Length 
    length = v3_length(a);
 
-   // scale a by 1 / ||a||
-      // function: v3_scale
-   v3_scale(a, (1/length)); 
+   // if the vector was non-zero
+   if (length > 0)
+   {
+      // scale a by 1 / ||a||
+         // function: v3_scale
+      v3_scale(a, (1/length)); 
+   }
+
+   // otherwise, zero vector, do nothing 
 
    // put the x of a into dest 
    dst[0] = a[0];
