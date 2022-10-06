@@ -43,3 +43,9 @@ Project1/p3Example.ppm
 Project2/Makefile~
 *.swp
 *.md~
+*.zip
+Project2/cs430_2_lms737_hnt37/Makefile
+Project2/cs430_2_lms737_hnt37/README.md
+Project2/cs430_2_lms737_hnt37/v3math.h
+Project2/cs430_2_lms737_hnt37/v3math.c
+Project2/cs430_2_lms737_hnt37/v3test.c
