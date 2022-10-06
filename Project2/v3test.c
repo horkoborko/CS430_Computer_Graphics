@@ -183,8 +183,6 @@ int main()
       }
    }
 
-
-
    // cross product test 1
    {
       float a[] = {1, 0, 0};
@@ -271,9 +269,6 @@ int main()
       }
    }
 
-
-
-
    // TESTS FOR ANGLE QUICK
  // test 1
  {
@@ -319,7 +314,6 @@ int main()
       printf("ERROR: Got %f, expected %f\n", calcResult[0], result[0]);
    }
  }
-
 
    // TESTS FOR ANGLE 
    //test 1

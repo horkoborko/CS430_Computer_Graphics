@@ -13,7 +13,6 @@ float v3_angle_quick(float *a, float *b); // angle between a and b; no cos-1
 void v3_reflect(float *dst, float *v, float *n);
 float v3_length(float *a);
 void v3_normalize(float *dst, float *a);
-
 bool v3_equals(float *a, float *b, float tolerance);
 
 
