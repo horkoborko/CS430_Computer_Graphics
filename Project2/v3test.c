@@ -39,14 +39,13 @@ int main()
    {
       float a[] = {200, -100, 505};
       float b[] = {-1, 2, 0};
-      float c[] = {0, 0, 0};
       float d[] = {-201, 102, -505};
 
       v3_from_points(a, a, b);
 
       if (!(v3_equals(a, d, .0001)))
       {
-         printf("ERROR: Got {%f, %f, %f}, expected {%f, %f, %f}\n", c[0], c[1], c[2], d[0], d[1], d[2]);
+         printf("ERROR: Got {%f, %f, %f}, expected {%f, %f, %f}\n", a[0], a[1], a[2], d[0], d[1], d[2]);
       }
    }
 
@@ -84,14 +83,13 @@ int main()
    {
       float a[] = {-20, 13, 2};
       float b[] = {11, -29, 15};
-      float c[] = {0, 0, 0};
       float d[] = {-9, -16, 17};
 
       v3_add(a, a, b);
 
       if (!(v3_equals(a, d, .0001)))
       {
-         printf("ERROR: Got {%f, %f, %f}, expected {%f, %f, %f}\n", c[0], c[1], c[2], d[0], d[1], d[2]);
+         printf("ERROR: Got {%f, %f, %f}, expected {%f, %f, %f}\n", a[0], a[1], a[2], d[0], d[1], d[2]);
       }
    }
  
@@ -129,14 +127,13 @@ int main()
    {
       float a[] = {-120, 135, 20};
       float b[] = {150, 180, 40};
-      float c[] = {0, 0, 0};
       float d[] = {-270, -45, -20};
 
       v3_subtract(a, a, b);
 
       if (!(v3_equals(a, d, .0001)))
       {
-         printf("ERROR: Got {%f, %f, %f}, expected {%f, %f, %f}\n", c[0], c[1], c[2], d[0], d[1], d[2]);
+         printf("ERROR: Got {%f, %f, %f}, expected {%f, %f, %f}\n", a[0], a[1], a[2], d[0], d[1], d[2]);
       }
    }
 
@@ -155,15 +152,126 @@ int main()
       }
    }
 
-/*
-   // TESTS FOR CROSS PRODUCT
-   v3_cross_product(c, b, a);
+   // dot product test 2
+   {
+      float a[] = {2, 7, 5};
+      float b[] = {10, 4, 2};
+      float result = 58;
+      float calcResult; 
+
+      calcResult = v3_dot_product(a,b);
+
+      if (result != calcResult)
+      {
+         printf("ERROR: Got %f, expected %f\n", calcResult, result); 
+      }
+   }
+
+   // dot product test 3
+   {
+      float a[] = {-1, 2, -112};
+      float b[] = {20, 50, 2};
+      float result = -144;
+      float calcResult; 
+
+      calcResult = v3_dot_product(a,b);
+
+      if (result != calcResult)
+      {
+         printf("ERROR: Got %f, expected %f\n", calcResult, result); 
+      }
+   }
 
 
-   // TESTS FOR SCALE
-   // Logan: I can do scale and up, if you can do the rest down below. 
-   v3_scale(a, 2);
-*/
+
+   // cross product test 1
+   {
+      float a[] = {1, 0, 0};
+      float b[] = {0, 1, 0};
+      float c[] = {0, 0, 0};
+      float d[] = {0, 0, 1};
+
+      v3_cross_product(c, a, b);
+
+      if (!(v3_equals(c, d, .0001)))
+      {
+         printf("ERROR: Got {%f, %f, %f}, expected {%f, %f, %f}\n", c[0], c[1], c[2], d[0], d[1], d[2]);
+      }
+   }
+
+   // cross product test 2 
+   {
+      float a[] = {2, -1, 4};
+      float b[] = {1, 4, 2};
+      float c[] = {0, 0, 0};
+      float d[] = {-18, 0, 9};
+
+      v3_cross_product(c, a, b);
+
+      if (!(v3_equals(c, d, .0001)))
+      {
+         printf("ERROR: Got {%f, %f, %f}, expected {%f, %f, %f}\n", c[0], c[1], c[2], d[0], d[1], d[2]);
+      }
+   }
+
+   // cross product test 3
+   {
+      float a[] = {50, 2, 20};
+      float b[] = {100, 9, -5};
+      float d[] = {-190, 2250, 250};
+
+      v3_cross_product(a, a, b);
+
+      if (!(v3_equals(a, d, .0001)))
+      {
+         printf("ERROR: Got {%f, %f, %f}, expected {%f, %f, %f}\n", a[0], a[1], a[2], d[0], d[1], d[2]);
+      }
+   }
+
+   // scale test 1
+   {
+      float a[] = {1, 0, 0};
+      float d[] = {2, 0, 0};
+      int scaling_factor = 2;
+
+      v3_scale(a, scaling_factor);
+
+      if (!(v3_equals(a, d, .0001)))
+      {
+         printf("ERROR: Got {%f, %f, %f}, expected {%f, %f, %f}\n", a[0], a[1], a[2], d[0], d[1], d[2]);
+      }
+   }
+
+   // scale test 1
+   {
+      float a[] = {102, 403, 506};
+      float d[] = {0, 0, 0};
+      int scaling_factor = 0;
+
+      v3_scale(a, scaling_factor);
+
+      if (!(v3_equals(a, d, .0001)))
+      {
+         printf("ERROR: Got {%f, %f, %f}, expected {%f, %f, %f}\n", a[0], a[1], a[2], d[0], d[1], d[2]);
+      }
+   }
+
+   // scale test 3
+   {
+      float a[] = {20, -10, 40};
+      float d[] = {60, -30, 120};
+      int scaling_factor = 3;
+
+      v3_scale(a, scaling_factor);
+
+      if (!(v3_equals(a, d, .0001)))
+      {
+         printf("ERROR: Got {%f, %f, %f}, expected {%f, %f, %f}\n", a[0], a[1], a[2], d[0], d[1], d[2]);
+      }
+   }
+
+
+
 
    // TESTS FOR ANGLE
  //  v3_angle(a, b);
