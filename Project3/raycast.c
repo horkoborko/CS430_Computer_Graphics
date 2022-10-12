@@ -51,6 +51,10 @@ void raycast(int width, int height, char *inputFile, char *outputFile)
 {
    // initalize variables 
 
+      // create an array of objects
+
+      // create a temp object for each object 
+
    // read in data 
     
       // open the file 
@@ -60,23 +64,17 @@ void raycast(int width, int height, char *inputFile, char *outputFile)
 
 	 // reset flags
 
-         // read in the first string TODO: CAN THE OBJECTS BE IN ANY ORDER? I>E> SPHERE CAMERA PLANE?
+         // read in the string 
 
          // if we are a camera 
-
-	    // create struct
 
             // set a camera flag 
 	    
          // if we are a sphere
 
-	    // create struct
-
             // set a sphere flag 
 	    
          // if we are a plane 
-
-	    // create struct
 
             // set a plane flag 
 	        
@@ -86,7 +84,7 @@ void raycast(int width, int height, char *inputFile, char *outputFile)
 
                // read in width 
 
-	    // otherwise, sphere or plane 
+	    // otherwise, if sphere or plane 
 
                // read in color 
 
@@ -96,7 +94,25 @@ void raycast(int width, int height, char *inputFile, char *outputFile)
 
 	       // read in height 
 
-            
+	    // otherwise, if plane or sphere
+	       
+	       // read in position
+
+	// if we are not at the end of the file 
+	
+	    // if we are a plane 
+
+	       // read in the normal vector 
+
+            // otherwise, if we are a sphere
+
+	       // read in the radius 
+
+            // otherwise, camera or other object, do nothing. 
+
+	// if we are a camera, a plane, or a sphere
+	
+	   // store the object in the object array
 
    // for every x on the image 
 
