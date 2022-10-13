@@ -34,16 +34,18 @@ void raycast(int width, int height, char *inputFile, char *outputFile);
 // Main Function
 int main(int argc, char *argv[])
 {
-   int size = sizeof prices / sizeof prices[0];
-
    // if the program was called with 5 total arguments
-   if(size <= 5)
+   if (argc == 5)
    {
-     raycast(argv[1], argv[2], argv[3], argv[4]);
+      // call raycast to raycast the image  
+      raycast((int)argv[1] - '0', (int)argv[2] - '0', argv[3], argv[4]);
    }
+
+   // otherwise, improper format
    else
    {
-     printf("ERROR: Format was improper; was expecting five arguments, bur received %d", size);
+      // print error 
+      printf("ERROR: Format was improper; was expecting five arguments, but received %d", argc);
    }
 
    return 0;
