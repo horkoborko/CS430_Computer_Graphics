@@ -1,5 +1,5 @@
 // Header Files
-#include <stdio.h>  // TODO: MAY NEED TO INCLUDE PPMRW.C here
+#include <stdio.h>  
 #include <stdbool.h>
 #include <stdlib.h>
 #include <string.h>
@@ -93,7 +93,7 @@ void raycast(int width, int height, char *inputFile, char *outputFile)
       float cameraWidth, cameraHeight;
       float B, C, X0, Y0, Z0, Xd, Yd, Zd, Xc, Yc, Zc;
       float deltaX, deltaY, P[3], Rd[3]; 
-      float lowestT = -INFINITY, t = -INFINITY; 
+      float lowestT = INFINITY, t = INFINITY; 
       float R0[] = {0, 0, 0};
       float discriminant, t0, t1;
       uint32_t *colorMap = (uint32_t *)( malloc(width * height * sizeof(uint32_t)));
@@ -213,7 +213,7 @@ void raycast(int width, int height, char *inputFile, char *outputFile)
 	    if (strcmp(readVal, "color:") == 0)
             {
 	       // store color
-	       fscanf(fh, " [%f, %f, %f]", &(tempObject.color[0]), &tempObject.color[1], &tempObject.color[2]);
+	       fscanf(fh, " [%f, %f, %f]", &(tempObject.color[0]), &(tempObject.color[1]), &(tempObject.color[2]));
             }
 
 	    // if the string is position
@@ -312,7 +312,7 @@ void raycast(int width, int height, char *inputFile, char *outputFile)
 	    tempObject = objects[objIndex];
 
 	    // if the object is a sphere
-	    if (objects[objIndex].kind == 2)
+	    if (tempObject.kind == 2)
             {
 	       // bind X0 
 	       X0 = R0[0];
@@ -379,8 +379,8 @@ void raycast(int width, int height, char *inputFile, char *outputFile)
                   // otherwise, both values negative 
 		  else
                   {
-	             // bind t to negative infinity 
-		     t = -INFINITY;
+	             // bind t to infinity 
+		     t = INFINITY;
                   }
 		}
 
@@ -416,19 +416,23 @@ void raycast(int width, int height, char *inputFile, char *outputFile)
 	       lowestT = t;
 
                // set the new closest object
-	       *closestObject = tempObject;
+	       closestObject = &(objects[objIndex]);
+
 	    }
 	   }
 
            // reset t 
-	   t = -INFINITY;
+	   t = INFINITY;
 
 	   // reset lowest t
-	   lowestT = -INFINITY;
+	   lowestT = INFINITY;
+
+
 
 	   // if closest object is not NULL
 	   if (closestObject != NULL)
            {
+
 	      // get red pixel value 
 	      red = (int) (closestObject->color[0] * 255);
 
