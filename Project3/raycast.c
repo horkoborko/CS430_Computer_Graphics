@@ -1,9 +1,12 @@
 // Header Files
-#include <stdio.h>
+#include <stdio.h>  // TODO: MAY NEED TO INCLUDE PPMRW.C here
 #include <stdbool.h>
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
+#include <stdint.h>
+#include "v3math.h"
+#include "ppmrw.h"
 
 // Global Constants
 const int MAX_OBJ = 128;
@@ -31,8 +34,6 @@ typedef struct object
       struct 
       {
          float pn[3];  // plane normal
-         float d; 
-
       };
 
       // camera properties 
@@ -80,14 +81,25 @@ void raycast(int width, int height, char *inputFile, char *outputFile)
 
       // create an array of objects
       object objects[MAX_OBJ];
+
+      // create other variables
       FILE *fh;
       char readVal[20];
-      object tempObject;
+      object tempObject, *closestObject = NULL;
       int clearingIndex = 0, storingIndex = 0, objIndex = 0;
       int rowIndex = 0, colIndex = 0, searchingIndex = 0;
+      int red, green, blue;
+      int bgColor[] = {0, 0, 0};
       float cameraWidth, cameraHeight;
-//      float B, C, X0, Y0, Z0, Xd, Yd, Zd;
-      float t = -INFINITY; 
+      float B, C, X0, Y0, Z0, Xd, Yd, Zd, Xc, Yc, Zc;
+      float deltaX, deltaY, P[3], Rd[3]; 
+      float lowestT = -INFINITY, t = -INFINITY; 
+      float R0[] = {0, 0, 0};
+      float discriminant, t0, t1;
+      uint32_t *colorMap = (uint32_t *)( malloc(width * height * sizeof(uint32_t)));
+      uint32_t tempNum;
+      
+
 
       // set temp object type to 0 
       tempObject.kind = 0;
@@ -97,6 +109,42 @@ void raycast(int width, int height, char *inputFile, char *outputFile)
    {
       // set its type to be nothing 
       objects[clearingIndex].kind = 0;
+
+      // set x position to 0
+      objects[clearingIndex].position[0] = 0;
+
+      // set y position to 0
+      objects[clearingIndex].position[1] = 0;
+
+      // set z position to 0
+      objects[clearingIndex].position[2] = 0; 
+
+      // set radius to 0 
+      objects[clearingIndex].radius = 0;
+
+      // set plane normal x to 0 
+      objects[clearingIndex].pn[0] = 0;
+
+      // set plane normal y to 0
+      objects[clearingIndex].pn[1] = 0;
+
+      // set plane normal z to 0
+      objects[clearingIndex].pn[2] = 0;
+
+      // set width to 0
+      objects[clearingIndex].width = 0;
+
+      // set height to 0
+      objects[clearingIndex].height = 0;
+      
+      // set color red to 0
+      objects[clearingIndex].color[0] = 0;
+
+      // set color green to 0
+      objects[clearingIndex].color[1] = 0;
+
+      // set color blue to 0
+      objects[clearingIndex].color[2] = 0;
    }
 
    // read in data
@@ -121,7 +169,7 @@ void raycast(int width, int height, char *inputFile, char *outputFile)
             tempObject.kind = 1;
          }
 
-         // if we are a sphere  TODO CAN WE EXPECT UPPER CASE NAMES OF OBJECTS IN THE FILE?
+         // if we are a sphere 
 	 if (strcmp(readVal, "sphere,") == 0)
 	 { 
             // set a sphere value for the object
@@ -141,8 +189,8 @@ void raycast(int width, int height, char *inputFile, char *outputFile)
 
 	 // while string is not camera, plane, or sphere and not end of file 
 	 while (!(strcmp(readVal, "camera,") == 0 || strcmp(readVal, "sphere,") == 0 || 
-				 strcmp(readVal, "plane,") == 0) && !feof(fh))  // TODO: SEE IF FEOF HERE IS CUTTING 
-										// OFF LAST INPUT VALUE FROM FILE
+				 strcmp(readVal, "plane,") == 0) && !feof(fh))   
+										
 	 {
 	    // if the string is width 
 	       // function: strcmp
@@ -228,12 +276,35 @@ void raycast(int width, int height, char *inputFile, char *outputFile)
       }
    }
 
-   // for every row on the image TODO: THINK IF NEED TO DEAL WITH INCOMPLETE DATA HERE
+   // for every row on the image 
    for (rowIndex = 0; rowIndex < height; rowIndex++)
    {
       // for every col on the image
       for (colIndex = 0; colIndex < width; colIndex++)
       {
+	 // calc deltaX
+         deltaX = cameraWidth / width;
+
+	 // calc deltaY
+	 deltaY = cameraHeight / height;
+
+         // calculate x of p value 
+	 P[0] = (-cameraWidth / 2.0) + (deltaX / 2.0) + (rowIndex * deltaX);
+
+	 // calculate y of p value 
+	 P[1] = (cameraHeight / 2.0) - (deltaY / 2.0) - (colIndex * deltaY);
+
+	 // put z of p value 
+	 P[2] = -1;
+
+	 // subtract r0 from p 
+	    // function: v3_subtract 
+	 v3_subtract(P, P, R0);
+
+	 // normalize p
+	    // function: v3_normalize
+	 v3_normalize(Rd, P);
+
          // for every object that we have
 	 for (objIndex = 0; objIndex < MAX_OBJ; objIndex++)
          {
@@ -243,70 +314,159 @@ void raycast(int width, int height, char *inputFile, char *outputFile)
 	    // if the object is a sphere
 	    if (objects[objIndex].kind == 2)
             {
-/*               // normalize Rd (normal vector)
-
-               // bind Xd 
-	       Xd = tempObject.pn[0];
-
-	       // bind Yd 
-	       Yd = tempObject.pn[1];
-
-	       // bind Zd
-	       Zd = tempObject.pn[2];
-
 	       // bind X0 
-	       X0 = tempObject.position[0];
+	       X0 = R0[0];
 
                // bind Y0 
-	       Y0 = tempObject.position[1];
+	       Y0 = R0[1];
 
                // bind Z0
-	       Z0 = tempObject.position[2];
+	       Z0 = R0[2];
 
-	       // calculate b  TODO: IS Rd R0 NORMALIZED?
+	       // bind Xd 
+               Xd = Rd[0];
+
+	       // bind Yd 
+	       Yd = Rd[1]; 
+
+	       // bind Zd
+	       Zd = Rd[2];
+
+	       // bind Xc 
+	       Xc = tempObject.position[0];
+
+	       // bind Yc
+	       Yc = tempObject.position[1];
+
+	       // bind Zc
+	       Zc = tempObject.position[2];
+
+	       // calculate b 
+	       B = 2 * (Xd * (X0 - Xc) + Yd * (Y0 - Yc) + Zd * (Z0 - Zc));
 
 	       // calculate c
+	          // function: pow
+	       C = pow(X0 - Xc, 2) + pow(Y0 - Yc, 2) + pow(Z0 - Zc, 2) - pow(tempObject.radius, 2);
 
-	       // calculate t0
+	       // calc discriminant 
+	          // function: pow
+	       discriminant = pow(B, 2) - (4 * C);
 
-	       // calculate t1 
+	       // if discriminant non-negative
+	       if (discriminant >= 0)
+               {
+	          // calculate t0
+		     // function: pow
+		  t0 = (-B + pow(discriminant, 1/2.0)) / 2.0;
 
-	       // if t0 < t1 and t0 > 0
+	          // calculate t1 
+		  t1 = (-B - pow(discriminant, 1/2.0)) / 2.0;
 
-	          // bind t to t0
+	          // if t0 < t1 and t0 > 0
+		  if (t0 < t1 && t0 > 0)
+                  {
+	             // bind t to t0
+		     t = t0;
+                  }
 
-	       // otherwise, if t0 > t1 and t1 > 0
+	          // otherwise, if t0 > t1 and t1 > 0
+		  else if (t0 > t1 && t1 > 0)
+                  {
+	             // bind t to t1 
+		     t = t1;
+                  }
 
-	          // bind t to t1 
+                  // otherwise, both values negative 
+		  else
+                  {
+	             // bind t to negative infinity 
+		     t = -INFINITY;
+                  }
+		}
 
-               // otherwise, both values negative 
-
-*/	          // bind t to negative infinity 
+		// otherwise, discriminant negative, no intersection
+	
             }		  
 		  
             // if the object is a plane
 	    if (tempObject.kind == 3)
             {
-	       // calculate single plane t
+	       // calculate the d value 
+
+	       // get the value of Vd
+
+	       // get the value of V0
+
+	       // get the value of t
+
+	       // if t is positive
+
+	          // bind t to t value 
+
+	       // otherwise, t is positive 
+
+	          // plane behind camera, do nothing 
 
 	    }
 
-            // if the t is the lowest t so far
-
+            // if the t is the lowest t so far and is positive
+	    if (t < lowestT && t > 0)
+            {
                // rebind lowest t to new t
+	       lowestT = t;
 
                // set the new closest object
+	       *closestObject = tempObject;
+	    }
 	   }
 
-           // reset t
+           // reset t 
+	   t = -INFINITY;
 
-           // put the color on the closest object into the end pixmap
+	   // reset lowest t
+	   lowestT = -INFINITY;
 
-           // reset closest object to first object
+	   // if closest object is not NULL
+	   if (closestObject != NULL)
+           {
+	      // get red pixel value 
+	      red = (int) (closestObject->color[0] * 255);
+
+	      // get blue pixel value 
+              green = (int) (closestObject->color[1] * 255);
+
+	      // get green pixel value 
+              blue = (int) (closestObject->color[2] * 255);
+
+	      // set value of tempNum 
+              tempNum = red << 24 | green << 16 | blue << 8 | 0xff;
+
+              // put the color on the closest object into the end pixmap
+              colorMap[rowIndex * width + colIndex] = tempNum;
+           }
+
+	   // otherwise, no intersection 
+	   else
+           {
+	      // set temp num to black 
+	      tempNum = bgColor[0] << 24 | bgColor[1] << 16 | bgColor[2] << 8 | 0xff;
+
+              // put black onto the pixmap
+              colorMap[rowIndex * width + colIndex] = tempNum;
+
+           }
+
+           // reset closest object to NULL
+	   closestObject = NULL;
       }
    }
 
    // write the pixmap to the output file in p3
+      // function: writeOutputFile
+   writeOutputFile(outputFile, colorMap, 3, width, height, 255); 
 
+   // free the color map
+      // function: free
+   free(colorMap);
 
 }

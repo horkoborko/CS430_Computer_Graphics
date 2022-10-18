@@ -4,8 +4,8 @@ RM=rm -rf
 
 all: raycast
 
-ppmrw: raycast
-	$(CC) $(CFLAGS) raycast.c -o raycast
+raycast: raycast.c ppmrw.c ppmrw.h v3math.c v3math.h
+	$(CC) $(CFLAGS) raycast.c v3math.c ppmrw.c -o raycast
 
-clean: 
-	$(RM) *~ raycast
+clean:
+	$(RM) *~ *.o raycast
