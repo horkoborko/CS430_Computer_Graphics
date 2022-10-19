@@ -21,8 +21,6 @@ typedef struct object
    // 3 = plane
    int kind; 
 
-   union 
-   {
       // sphere properties 
       struct 
       {
@@ -46,7 +44,7 @@ typedef struct object
 
       float color[3];
 
-   };
+   
 
 } object;
 
@@ -91,7 +89,7 @@ void raycast(int width, int height, char *inputFile, char *outputFile)
       int red, green, blue;
       int bgColor[] = {0, 0, 0};
       float cameraWidth, cameraHeight;
-      float B, C, X0, Y0, Z0, Xd, Yd, Zd, Xc, Yc, Zc;
+      float B, C, X0, Y0, Z0, Xd, Yd, Zd, Xc, Yc, Zc, D, Vd, V0;
       float deltaX, deltaY, P[3], Rd[3]; 
       float lowestT = INFINITY, t = INFINITY; 
       float R0[] = {0, 0, 0};
@@ -99,8 +97,6 @@ void raycast(int width, int height, char *inputFile, char *outputFile)
       uint32_t *colorMap = (uint32_t *)( malloc(width * height * sizeof(uint32_t)));
       uint32_t tempNum;
       
-
-
       // set temp object type to 0 
       tempObject.kind = 0;
 
@@ -210,10 +206,11 @@ void raycast(int width, int height, char *inputFile, char *outputFile)
 
 	    // if the string is color 	    	    
  	       // function: strcmp
-	    if (strcmp(readVal, "color:") == 0)
+	    if (strcmp(readVal, "color:") == 0)   
             {
 	       // store color
-	       fscanf(fh, " [%f, %f, %f]", &(tempObject.color[0]), &(tempObject.color[1]), &(tempObject.color[2]));
+	       fscanf(fh, " [%f, %f, %f]", &tempObject.color[0], &(tempObject.color[1]), &tempObject.color[2]);
+
             }
 
 	    // if the string is position
@@ -289,10 +286,10 @@ void raycast(int width, int height, char *inputFile, char *outputFile)
 	 deltaY = cameraHeight / height;
 
          // calculate x of p value 
-	 P[0] = (-cameraWidth / 2.0) + (deltaX / 2.0) + (rowIndex * deltaX);
+	 P[0] = (-cameraWidth / 2.0) + (deltaX / 2.0) + (colIndex * deltaX);
 
 	 // calculate y of p value 
-	 P[1] = (cameraHeight / 2.0) - (deltaY / 2.0) - (colIndex * deltaY);
+	 P[1] = (cameraHeight / 2.0) - (deltaY / 2.0) - (rowIndex * deltaY);
 
 	 // put z of p value 
 	 P[2] = -1;
@@ -342,7 +339,7 @@ void raycast(int width, int height, char *inputFile, char *outputFile)
 	       Zc = tempObject.position[2];
 
 	       // calculate b 
-	       B = 2 * (Xd * (X0 - Xc) + Yd * (Y0 - Yc) + Zd * (Z0 - Zc));
+	       B = 2 * ((Xd * (X0 - Xc)) + (Yd * (Y0 - Yc)) + (Zd * (Z0 - Zc)));
 
 	       // calculate c
 	          // function: pow
@@ -392,18 +389,28 @@ void raycast(int width, int height, char *inputFile, char *outputFile)
 	    if (tempObject.kind == 3)
             {
 	       // calculate the d value 
+	          // function: v3_dot_product
+	       D = -(v3_dot_product(tempObject.position, tempObject.pn));
 
 	       // get the value of Vd
+	          // function: v3_dot_product
+	       Vd = v3_dot_product(tempObject.pn, Rd);
 
 	       // get the value of V0
+	          // function: v3_dot_product
+	       V0 = -(v3_dot_product(tempObject.pn, R0) + D);
 
 	       // get the value of t
+	       t0 = V0 / Vd;
 
 	       // if t is positive
-
+	       if (t0 > 0)
+               {
 	          // bind t to t value 
+		  t = t0;
+               }
 
-	       // otherwise, t is positive 
+	       // otherwise, t is negative 
 
 	          // plane behind camera, do nothing 
 
@@ -426,8 +433,6 @@ void raycast(int width, int height, char *inputFile, char *outputFile)
 
 	   // reset lowest t
 	   lowestT = INFINITY;
-
-
 
 	   // if closest object is not NULL
 	   if (closestObject != NULL)
