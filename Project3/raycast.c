@@ -235,6 +235,10 @@ void raycast(int width, int height, char *inputFile, char *outputFile)
             {
 	       // store normal
 	       fscanf(fh, " [%f, %f, %f]", &tempObject.pn[0], &tempObject.pn[1], &tempObject.pn[2]);
+
+	       // normalize the normal 
+	          // function: v3_normalize
+	       v3_normalize(tempObject.pn, tempObject.pn);
             }
 
 	    // read the next data string 
