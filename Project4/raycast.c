@@ -51,7 +51,7 @@ typedef struct object
 	 float radialA1;
 	 float radialA0; 
 	 float angularA0;
-	 float direction;
+	 float direction[3];
 
       };
 
@@ -66,6 +66,7 @@ typedef struct object
 
 // Function Prototypes
 void raycast(int width, int height, char *inputFile, char *outputFile);
+float shoot(float *R0, float *Rd, object currentObject);
 
 // Main Function
 int main(int argc, char *argv[])
@@ -96,6 +97,9 @@ void raycast(int width, int height, char *inputFile, char *outputFile)
       // create an array of objects
       object objects[MAX_OBJ];
 
+      // create an array of lights 
+      object lights[MAX_OBJ];
+
       // create other variables
       FILE *fh;
       char readVal[20];
@@ -104,12 +108,17 @@ void raycast(int width, int height, char *inputFile, char *outputFile)
       int rowIndex = 0, colIndex = 0, searchingIndex = 0;
       int red, green, blue;
       int bgColor[] = {0, 0, 0};
+      int lightStoringIndex = 0;
+      int numLights = 0;
+      int lightIndex = 0;
       float cameraWidth, cameraHeight;
       float B, C, X0, Y0, Z0, Xd, Yd, Zd, Xc, Yc, Zc, D, Vd, V0;
       float deltaX, deltaY, P[3], Rd[3]; 
       float lowestT = INFINITY, t = INFINITY; 
       float R0[] = {0, 0, 0};
       float discriminant, t0, t1;
+      float RdNaut[3];
+      float tShoot = 0;
       uint32_t *colorMap = (uint32_t *)( malloc(width * height * sizeof(uint32_t)));
       uint32_t tempNum;
       
@@ -159,20 +168,46 @@ void raycast(int width, int height, char *inputFile, char *outputFile)
       objects[clearingIndex].color[2] = 0;
 
       // set radial a0 to 0 
+      objects[clearingIndex].radialA0 = 0;
 
       // set radial a1 to 0
+      objects[clearingIndex].radialA1 = 0;
 
       // set radial a2 to 0 
+      objects[clearingIndex].radialA2 = 0;
 
       // set theta to 0 
+      objects[clearingIndex].theta = 0;
 
       // set angular a0 to 0 
+      objects[clearingIndex].angularA0 = 0;
 
       // set direction x to 0 
+      objects[clearingIndex].direction[0] = 0;
 
       // set direction y to 0 
+      objects[clearingIndex].direction[1] = 0;
 
       // set direction z to 0
+      objects[clearingIndex].direction[2] = 0;
+
+      // set specular color r to 0 
+      objects[clearingIndex].specularColor[0] = 0;
+      
+      // set specular color g to 0      
+      objects[clearingIndex].specularColor[1] = 0;
+       
+      // set specular color b to 0 
+      objects[clearingIndex].specularColor[2] = 0;
+
+      // set diffuse color r to 0 
+      objects[clearingIndex].diffuseColor[0] = 0;
+
+      // set diffuse color g to 0 
+      objects[clearingIndex].diffuseColor[1] = 0;
+
+      // set diffuse color b to 0
+      objects[clearingIndex].diffuseColor[2] = 0;       
    }
 
    // read in data
@@ -212,8 +247,11 @@ void raycast(int width, int height, char *inputFile, char *outputFile)
          }
 
 	 // if we are a light 
-
+	 if (strcmp(readVal, "light,") == 0)
+	 {
 	    // set a light value for the object
+	    tempObject.kind = 4;
+	 }
 	 
 	 // read first data string 
 	    // function: fscanf
@@ -279,24 +317,39 @@ void raycast(int width, int height, char *inputFile, char *outputFile)
             }
 
 	    // if the string is radial a0 
-
+	    if (strcmp(readVal, "radial-a0:") == 0)
+	    {
 	       // store radial a0 
+	       fscanf(fh, "%f", &tempObject.radialA0);
+            }
 
 	    // if the string is radial a1
-
+	    if (strcmp(readVal, "radial-a1:") == 0)
+            {
 	       // store radial a1 
+	       fscanf(fh, "%f", &tempObject.radialA1);
+            }
 
 	    // if the string is radial a2
-
+	    if (strcmp(readVal, "radial-a2:") == 0)
+            {
 	       // store radial a2
+	       fscanf(fh, "%f", &tempObject.radialA2);
+            }
 
 	    // if the string is angular a0
-
+	    if (strcmp(readVal, "angular-a0:") == 0)
+            {
 	       // store angular a0
+	       fscanf(fh, "%f", &tempObject.angularA0);
+            }
 
 	    // if the string is direction 
-
+	    if (strcmp(readVal, "direction:") == 0)
+            {
 	       // store direction
+	       fscanf(fh, " [%f, %f, %f]", &tempObject.direction[0], &tempObject.direction[1], &tempObject.direction[2]);
+            }
 
 	    // read the next data string 
 	       // function: fscanf
@@ -305,19 +358,29 @@ void raycast(int width, int height, char *inputFile, char *outputFile)
          }
 
 	 // if the object is a light 
+	 if (tempObject.kind == 4)
+         {
 
 	    // store in light array 
+	    lights[lightStoringIndex] = tempObject;
 
 	    // increase number of lights
+	    numLights++;
 
-	 // othrewise 
+	    // increment index
+	    lightStoringIndex++;
+         }
 
+	 // otherwise 
+         else
+         {
 	    // store the object in the object array
 	    objects[storingIndex] = tempObject;
+	    
+	    // increment array storing index
+	    storingIndex++;
+         }
 
-	 // increment array storing index
-	 storingIndex++;
-	 
 	 // reset temp object type in case no data
 	 tempObject.kind = 0;
 
@@ -499,11 +562,20 @@ void raycast(int width, int height, char *inputFile, char *outputFile)
 
 	   }
 
-	   // for all lights 
+/*	   // for all lights 
+	   for (lightIndex = 0; lightIndex < numLights; lightIndex++)
+           {
+              // get R0 Naut 
+              v3_scale(Rd, t);
+
+	      // get Rd Naut 
+              v3_subtract(RdNaut, lights[lightIndex].position, Rd);
 
 	      // shoot out a ray from the intersection 
 	         // function: shoot
-
+	      tShoot = shoot(Rd,RdNaut, tempObject);
+           }
+*/
 	   // if the t from shoot is positive TODO: CONTINUE THINKING HERE
 
            // reset t 
@@ -513,7 +585,7 @@ void raycast(int width, int height, char *inputFile, char *outputFile)
 	   lowestT = INFINITY;
 
 	   // if closest object is not NULL
-	   if (closestObject != NULL)
+	   if (closestObject != NULL) // TODO: FIGURE OUT WHY COLOR RANDOM WHEN RAYCASTED
            {
 
 	      // get red pixel value 
@@ -556,4 +628,12 @@ void raycast(int width, int height, char *inputFile, char *outputFile)
       // function: free
    free(colorMap);
 
+}
+
+float shoot(float *R0, float *Rd, object currentObject)
+{
+
+
+
+   return 0; // STUB RETURN
 }
