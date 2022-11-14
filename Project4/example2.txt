@@ -1,0 +1,4 @@
+camera, width: 2.0, height: 2.0
+plane, normal: [0, 0, 1], diffuse_color: [0, 1, 0], position: [0, 0, -1.5]
+light, color: [1, 1, 1], theta: .7, angular-a0: 1, direction: [0, 0, -1], radial-a2: 0.125, radial-a1: 0.125, radial-a0: 0.125, position: [0, 0, -1]
+
