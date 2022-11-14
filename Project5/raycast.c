@@ -59,6 +59,7 @@ typedef struct object
       float position[3];
       float diffuseColor[3];
       float color[3];
+      float reflectivity;
 
    
 
@@ -67,7 +68,7 @@ typedef struct object
 // Function Prototypes
 void raycast(int width, int height, char *inputFile, char *outputFile);
 float shoot(float *R0, float *Rd, object currentObject, object **closestObject, object *objects);
-void illuminate(float *point, object currentObject, object *lights, int numLights, float *red, float *green, float *blue, object *objects);
+void illuminate(float *point, object currentObject, object *lights, int numLights, float *red, float *green, float *blue, object *objects, int recLimit);
 float clamp(float clampVal, float low, float high);
 
 // Main Function
@@ -376,6 +377,15 @@ void raycast(int width, int height, char *inputFile, char *outputFile)
 	       fscanf(fh, " [%f, %f, %f]", &tempObject.diffuseColor[0], &tempObject.diffuseColor[1], &tempObject.diffuseColor[2]);
             }
 
+
+	    // if the string is reflectivity
+	       // function: strcmp
+	    if (strcmp(readVal, "reflectivity:") == 0)
+            {
+	       // store reflectivity 
+	       fscanf(fh, "%f", &tempObject.reflectivity);
+	    }
+
 	    // read the next data string 
 	       // function: fscanf
 	    fscanf(fh, "%s", readVal);
@@ -488,7 +498,7 @@ void raycast(int width, int height, char *inputFile, char *outputFile)
 
    	    // illuminate the object, get the color 
 	       // function: illuminate
-	    illuminate(point, *closestObject, lights, numLights, &redIllum, &greenIllum, &blueIllum, objects);
+	    illuminate(point, *closestObject, lights, numLights, &redIllum, &greenIllum, &blueIllum, objects, 5);
 
 	    // clamp red value 
 	       // function: clamp 
@@ -702,7 +712,7 @@ float shoot(float *R0, float *Rd, object currentObject, object **closestObject, 
 }
 
 
-void illuminate(float *point, object currentObject, object *lights, int numLights, float *red, float *green, float *blue, object *objects)
+void illuminate(float *point, object currentObject, object *lights, int numLights, float *red, float *green, float *blue, object *objects, int recLimit)
 {
    // initialize variables
    int lightIndex = 0;
@@ -718,17 +728,28 @@ void illuminate(float *point, object currentObject, object *lights, int numLight
    float normal[3];
    float R[3];
    float V[3];
+   float reflection[3];
+   float newPoint[3];
    object *dummyObject;
+   object *closestObject;
    object light;
 
    // reset red value 
-   *red = 0;
+   //*red = 0;
 
    // reset green value 
-   *green = 0;
+   //*green = 0;
 
    // reset blue value 
-   *blue = 0;
+   //*blue = 0;
+   
+
+   // if the recursion limit is 0 
+   if (recLimit == 0)
+   {
+      // return from function call
+      return;
+   }
 
    // for all lights 
    for (lightIndex = 0; lightIndex < numLights; lightIndex++)
@@ -748,7 +769,7 @@ void illuminate(float *point, object currentObject, object *lights, int numLight
          // function: v3_normalize
       v3_normalize(lightRay, lightRay);
 
-      // shoot a ray from the point to the light, see if intersection
+      // shoot a ray from the point to the light, see if intersectioncurrentObject, closestObject, objects);
          // function: shoot
       t = shoot(point, lightRay, currentObject, &dummyObject, objects);
 
@@ -939,6 +960,36 @@ void illuminate(float *point, object currentObject, object *lights, int numLight
       // calc value, add to B of color
       *blue += radAtten * angAtten * (Ispec[2] + Idiff[2]);
 
+      // calc reflection vector (view about normal)
+         // function: v3_reflect
+      v3_reflect(reflection, point, normal);
+
+      // normalize the reflection 
+         // function: v3_normalize
+      v3_normalize(reflection, reflection);
+
+      // set closest object to nothing 
+      closestObject = NULL;
+
+      // shoot from origin with direction of reflection vector 
+         // function: shoot
+      t = shoot(point, reflection, currentObject, &closestObject, objects);
+
+      // get new Rd * t
+         // funciton: v3_scale
+      v3_scale(reflection, t);
+
+      // get new point 
+         // function: v3_add
+      v3_add(newPoint, point, reflection);
+
+      // if closest object exists 
+      if (closestObject != NULL)
+      { 
+         // illuminate with one less than current limit 
+            // function: illuminate
+         illuminate(newPoint, *closestObject, lights, numLights, red, blue, green, objects, recLimit - 1);
+      }
    }
 }
 
