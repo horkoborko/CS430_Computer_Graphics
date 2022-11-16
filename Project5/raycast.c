@@ -252,6 +252,9 @@ void raycast(int width, int height, char *inputFile, char *outputFile)
 	 {
 	    // set a light value for the object
 	    tempObject.kind = 4;
+
+	    // set the theta to 0 in case not read 
+	    tempObject.theta = 0;
 	 }
 	 
 	 // read first data string 
@@ -498,7 +501,7 @@ void raycast(int width, int height, char *inputFile, char *outputFile)
 
    	    // illuminate the object, get the color 
 	       // function: illuminate
-	    illuminate(point, *closestObject, lights, numLights, &redIllum, &greenIllum, &blueIllum, objects, 5);
+	    illuminate(point, *closestObject, lights, numLights, &redIllum, &greenIllum, &blueIllum, objects, 7);
 
 	    // clamp red value 
 	       // function: clamp 
@@ -730,23 +733,28 @@ void illuminate(float *point, object currentObject, object *lights, int numLight
    float V[3];
    float reflection[3];
    float newPoint[3];
+   float reflRed = 0;
+   float reflBlue = 0;
+   float reflGreen = 0;
+   float tempRed = 0;
+   float tempGreen = 0;
+   float tempBlue = 0;
    object *dummyObject;
    object *closestObject;
    object light;
 
-   // reset red value 
-   //*red = 0;
-
-   // reset green value 
-   //*green = 0;
-
-   // reset blue value 
-   //*blue = 0;
-   
-
    // if the recursion limit is 0 
    if (recLimit == 0)
    {
+      // set red to 0 
+      *red = 0;
+
+      // set green to 0 
+      *green = 0;
+
+      // set blue to 0
+      *blue = 0;
+
       // return from function call
       return;
    }
@@ -769,7 +777,7 @@ void illuminate(float *point, object currentObject, object *lights, int numLight
          // function: v3_normalize
       v3_normalize(lightRay, lightRay);
 
-      // shoot a ray from the point to the light, see if intersectioncurrentObject, closestObject, objects);
+      // shoot a ray from the point to the light, see if intersection
          // function: shoot
       t = shoot(point, lightRay, currentObject, &dummyObject, objects);
 
@@ -952,13 +960,17 @@ void illuminate(float *point, object currentObject, object *lights, int numLight
 	 }
 
       // calc value, add to R of color 
-      *red += radAtten * angAtten * (Ispec[0] + Idiff[0]);
+      tempRed = radAtten * angAtten * (Ispec[0] + Idiff[0]);
 
       // calc value, add to G of color 
-      *green += radAtten * angAtten * (Ispec[1] + Idiff[1]);
+      tempGreen = radAtten * angAtten * (Ispec[1] + Idiff[1]);
 
       // calc value, add to B of color
-      *blue += radAtten * angAtten * (Ispec[2] + Idiff[2]);
+      tempBlue = radAtten * angAtten * (Ispec[2] + Idiff[2]);
+
+      // normalize the normal 
+         // function: v3_normalize
+      v3_normalize(normal, normal);
 
       // calc reflection vector (view about normal)
          // function: v3_reflect
@@ -975,6 +987,7 @@ void illuminate(float *point, object currentObject, object *lights, int numLight
          // function: shoot
       t = shoot(point, reflection, currentObject, &closestObject, objects);
 
+
       // get new Rd * t
          // funciton: v3_scale
       v3_scale(reflection, t);
@@ -988,8 +1001,20 @@ void illuminate(float *point, object currentObject, object *lights, int numLight
       { 
          // illuminate with one less than current limit 
             // function: illuminate
-         illuminate(newPoint, *closestObject, lights, numLights, red, blue, green, objects, recLimit - 1);
+         illuminate(newPoint, *closestObject, lights, numLights, &reflRed, &reflGreen, &reflBlue, objects, recLimit - 1);
+
       }
+
+      // modify red 
+      *red += (tempRed * (1 - currentObject.reflectivity)) + (currentObject.reflectivity * reflRed);
+
+      // modify green 
+      *green += (tempGreen * (1 - currentObject.reflectivity)) + (currentObject.reflectivity * reflGreen);
+
+      // modify blue
+      *blue += (tempBlue * (1 - currentObject.reflectivity)) + (currentObject.reflectivity * reflBlue);
+
+      
    }
 }
 
